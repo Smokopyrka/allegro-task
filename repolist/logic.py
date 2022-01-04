@@ -38,16 +38,19 @@ class API:
         return res
 
     async def get_user_repos(self, username):
-        url = f'{self.api_url}/users/{username}/repos'
-        kwargs = {
-            'headers': self._headers,
-            'params': {
-                'per_page': 100,
-                'page': 1
-            }
-        }
         async with aiohttp.ClientSession() as session:
-            res = await self._fetch(session, url, **kwargs)
+            async def fetch_page(page):
+                url = f'{self.api_url}/users/{username}/repos'
+                kwargs = {
+                    'headers': self._headers,
+                    'params': {
+                        'per_page': 100,
+                        'page': page
+                    }
+                }
+                return await self._fetch(session, url, **kwargs)
+
+            res = await fetch_page(1)
             async with res:
                 repos = await res.json()
                 async for repo in self._yield_repos(repos):
@@ -60,18 +63,7 @@ class API:
                 r'page=(\d+)>; rel="last"', links)
             last_page = int(last_page_match.group(1))
 
-            tasks = []
-            for num in range(2, last_page+1):
-                kwargs = {
-                    'headers': self._headers,
-                    'params': {
-                        'per_page': 100,
-                        'page': num
-                    }
-                }
-                coro = self._fetch(session, url, **kwargs)
-                tasks.append(coro)
-            
+            tasks = [fetch_page(i) for i in range(2, last_page+1)]
             for task in asyncio.as_completed(tasks):
                 res = await task
                 async with res:
@@ -86,8 +78,8 @@ class API:
     async def get_users_language_list(self, user):
         langs = {}
         async with aiohttp.ClientSession() as session:
-            tasks = []
             repos = self.get_user_repos(user)
+            tasks = []
             async for repo in repos:
                 repo_name = repo['name']
                 url = f'{self.api_url}/repos/{repo_name}/languages'
