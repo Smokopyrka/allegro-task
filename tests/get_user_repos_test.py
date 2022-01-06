@@ -51,6 +51,16 @@ class ClientErrorResponseMock:
         self.status = status
 
 
+def check_get_repo_result(actual, expected):
+    actual = sorted(actual, key=lambda item: item['id'])
+    assert len(actual) == len(expected)
+    for act, exp in zip(actual, expected):
+        assert act['id'] == exp['id']
+        assert act['name'] == exp['name']
+        assert act['stars'] == exp['stars']
+        assert len(act.keys()) == len(exp.keys())
+
+
 @pytest.mark.asyncio
 async def test_get_user_repo_multiple_page(mocker):
     mock_resps = [
@@ -73,13 +83,7 @@ async def test_get_user_repo_multiple_page(mocker):
     api = API()
 
     ret = [repo async for repo in api.get_user_repos('test')]
-    ret = sorted(ret, key=lambda item: item['id'])
-    assert len(ret) == len(test_data)
-    for act, exp in zip(ret, expected):
-        assert act['id'] == exp['id']
-        assert act['name'] == exp['name']
-        assert act['stars'] == exp['stars']
-        assert len(act.keys()) == len(exp.keys())
+    check_get_repo_result(ret, expected)
 
 
 @pytest.mark.asyncio
@@ -95,13 +99,23 @@ async def test_get_user_repo_single_page(mocker):
     api = API()
 
     ret = [repo async for repo in api.get_user_repos('test')]
-    ret = sorted(ret, key=lambda item: item['id'])
-    assert len(ret) == len(test_data)
-    for act, exp in zip(ret, expected):
-        assert act['id'] == exp['id']
-        assert act['name'] == exp['name']
-        assert act['stars'] == exp['stars']
-        assert len(act.keys()) == len(exp.keys())
+    check_get_repo_result(ret, expected)
+
+
+@pytest.mark.asyncio
+async def test_get_user_repo_for_user_with_no_repos(mocker):
+    async def mock_get(*args, **kwargs):
+        return ClientResponseMock([], 1, last_page=1)
+
+    mocker.patch(
+        'aiohttp.ClientSession.get',
+        mock_get
+    )
+
+    api = API()
+
+    ret = [repo async for repo in api.get_user_repos('test')]
+    assert not ret
 
 
 @pytest.mark.asyncio
