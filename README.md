@@ -24,7 +24,7 @@ Upon generating the token, declare the following environment variables, and set 
    - `GITHUB_USER=<username of the account the token belongs to>`
 
 ### Running the tests
-To run the tests on the project and get info about the code coverage achieved, run `python3 -m pytest --cov=repolist.logic` in the root directory of the project
+To run tests on the project and get info about the code coverage achieved, run `python3 -m pytest --cov=repolist.logic` in the root directory of the project
 
 ## API Endpoints
 * /users/{username}/repos - List repos of a given user
