@@ -34,7 +34,7 @@ async def get_user_repos(username):
 @app.get('/user/<username>/stars')
 async def get_user_star_sum(username):
     return {
-        'stars': await api.get_user_star_total(username)
+        'star_count': await api.get_user_star_total(username)
     }
 
 
