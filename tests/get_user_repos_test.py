@@ -18,7 +18,7 @@ for item in test_data:
         {
             'id': item['id'],
             'name': item['full_name'],
-            'stars': item['stargazers_count']
+            'star_count': item['stargazers_count']
         }
     )
 

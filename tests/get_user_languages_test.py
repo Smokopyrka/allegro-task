@@ -8,7 +8,7 @@ for i in range(3):
         {
             'id': i,
             'name': f'test_user/repo{i}',
-            'stars': i
+            'star_count': i
         }
     )
 

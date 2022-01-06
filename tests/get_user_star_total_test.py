@@ -1,4 +1,3 @@
-import re
 import pytest
 from repolist.logic import API
 
@@ -8,7 +7,7 @@ for i in range(7):
         {
             'id': i,
             'name': f'test_user/repo{i}',
-            'stars': i
+            'star_count': i
         }
     )
 
@@ -25,7 +24,7 @@ async def test_with_one_repo(mocker):
 
     api = API('dummy.com')
 
-    assert test_data[0]['stars'] == await api.get_user_star_total('test')
+    assert test_data[0]['star_count'] == await api.get_user_star_total('test')
 
 
 @pytest.mark.asyncio
@@ -41,7 +40,7 @@ async def test_with_multiple_repo(mocker):
 
     api = API('dummy.com')
 
-    expected = sum([data['stars'] for data in test_data])
+    expected = sum([data['star_count'] for data in test_data])
     assert expected == await api.get_user_star_total('test')
 
 @pytest.mark.asyncio
