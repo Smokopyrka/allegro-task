@@ -15,6 +15,15 @@ class UserQuotaExceededError(Exception):
 class API:
 
     def __init__(self, url, *, username=None, auth_token=None):
+        """API Object Consstructor
+
+        Args:
+            url (str): GitHubAPI URL
+            username (str, optional): Username of the user authenticating
+                to the GitHubAPI. Defaults to None.
+            auth_token (str, optional): GitHub Personal Access Token.
+                Defaults to None.
+        """
         self.api_url = url
         self._headers = {}
         if auth_token is not None:
