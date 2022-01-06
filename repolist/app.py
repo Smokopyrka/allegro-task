@@ -1,8 +1,12 @@
 from flask import Flask, abort, jsonify
 from logic import API, InvalidUserError, UserQuotaExceededError
+import os
 
 app = Flask(__name__)
-api = API()
+auth_token = os.environ.get('GITHUB_TOKEN')
+username = os.environ.get('GITHUB_USER')
+url = 'https://api.github.com'
+api = API(url, auth_token=auth_token, username=username)
 
 
 @app.errorhandler(InvalidUserError)

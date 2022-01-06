@@ -1,7 +1,6 @@
 import aiohttp
 import asyncio
 import re
-import os
 
 
 class InvalidUserError(Exception):
@@ -14,13 +13,13 @@ class UserQuotaExceededError(Exception):
 
 class API:
 
-    def __init__(self):
-        self.api_url = 'https://api.github.com'
+    def __init__(self, url, *, username=None, auth_token=None):
+        self.api_url = url
         self._headers = {}
-        if (token := os.environ.get('GITHUB_TOKEN')) is not None:
-            self._headers['Authorization'] = f'token {token}'
-        if (user_agent := os.environ.get('GITHUB_USER')) is not None:
-            self._headers['User-Agent'] = user_agent
+        if auth_token is not None:
+            self._headers['Authorization'] = f'token {auth_token}'
+        if username is not None:
+            self._headers['User-Agent'] = username
 
     async def _yield_repos(self, repos):
         for repo in repos:

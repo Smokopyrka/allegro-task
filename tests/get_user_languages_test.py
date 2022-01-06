@@ -72,7 +72,7 @@ async def test_get_user_lang_with_one_repo(mocker):
         }
     ]
 
-    api = API()
+    api = API('dummy.com')
 
     actual = await api.get_users_language_list('test_user')
     assert actual == exptected
@@ -114,7 +114,7 @@ async def test_get_user_lang_with_many_repos(mocker):
         }
     ]
 
-    api = API()
+    api = API('dummy.com')
 
     actual = await api.get_users_language_list('test_user')
     assert actual == exptected

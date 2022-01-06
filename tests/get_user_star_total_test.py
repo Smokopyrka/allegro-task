@@ -23,7 +23,7 @@ async def test_with_one_repo(mocker):
         mock_get_user_repos
     )
 
-    api = API()
+    api = API('dummy.com')
 
     assert test_data[0]['stars'] == await api.get_user_star_total('test')
 
@@ -39,7 +39,7 @@ async def test_with_multiple_repo(mocker):
         mock_get_user_repos
     )
 
-    api = API()
+    api = API('dummy.com')
 
     expected = sum([data['stars'] for data in test_data])
     assert expected == await api.get_user_star_total('test')
@@ -56,7 +56,7 @@ async def test_with_no_repos(mocker):
         mock_get_user_repos
     )
 
-    api = API()
+    api = API('dummy.com')
 
     expected = 0
     assert expected == await api.get_user_star_total('test')

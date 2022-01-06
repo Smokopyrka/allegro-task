@@ -17,7 +17,7 @@ async def test_fetch(mocker):
         mock_get_error
     )
 
-    api = API()
+    api = API('dummy.com')
 
     async with aiohttp.ClientSession() as session:
         await api._fetch(session, None)
@@ -32,7 +32,7 @@ async def test_get_user_repo_invalid_user(mocker):
         mock_get_error
     )
 
-    api = API()
+    api = API('dummy.com')
 
     with pytest.raises(InvalidUserError):
         async with aiohttp.ClientSession() as session:
@@ -49,7 +49,7 @@ async def test_get_user_repo_quota_exceeded(mocker):
         mock_get_error
     )
 
-    api = API()
+    api = API('dummy.com')
 
     with pytest.raises(UserQuotaExceededError):
         async with aiohttp.ClientSession() as session:

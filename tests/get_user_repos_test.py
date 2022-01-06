@@ -65,7 +65,7 @@ async def test_get_user_repo_multiple_page(mocker):
         mock_get
     )
 
-    api = API()
+    api = API('dummy.com')
 
     ret = [repo async for repo in api.get_user_repos('test')]
     actual = sorted(ret, key=lambda item: item['id'])
@@ -82,7 +82,7 @@ async def test_get_user_repo_single_page(mocker):
         mock_get
     )
 
-    api = API()
+    api = API('dummy.com')
 
     ret = [repo async for repo in api.get_user_repos('test')]
     actual = sorted(ret, key=lambda item: item['id'])
@@ -99,7 +99,7 @@ async def test_get_user_repo_for_user_with_no_repos(mocker):
         mock_get
     )
 
-    api = API()
+    api = API('dummy.com')
 
     ret = [repo async for repo in api.get_user_repos('test')]
     assert not ret
