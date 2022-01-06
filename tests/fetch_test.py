@@ -12,7 +12,7 @@ class ClientErrorResponseMock:
 
 
 @pytest.mark.asyncio
-async def test_fetch(mocker):
+async def test_with_200_success(mocker):
     async def mock_get_error(*args, **kwargs):
         return ClientErrorResponseMock(200)
 
@@ -26,7 +26,7 @@ async def test_fetch(mocker):
 
 
 @pytest.mark.asyncio
-async def test_get_user_repo_invalid_user(mocker):
+async def test_with_404_error(mocker):
     async def mock_get_error(*args, **kwargs):
         return ClientErrorResponseMock(404)
 
@@ -41,7 +41,7 @@ async def test_get_user_repo_invalid_user(mocker):
 
 
 @pytest.mark.asyncio
-async def test_get_user_repo_quota_exceeded(mocker):
+async def test_with_403_error(mocker):
     async def mock_get_error(*args, **kwargs):
         return ClientErrorResponseMock(403)
 

@@ -3,9 +3,9 @@ from repolist.logic import API
 
 api = API('dummy.com')
 
-test_data = []
+test_repos = []
 for i in range(7):
-    test_data.append(
+    test_repos.append(
         {
             'id': i,
             'full_name': f'test_user/repo{i}',
@@ -15,7 +15,7 @@ for i in range(7):
 
 
 expected = []
-for item in test_data:
+for item in test_repos:
     expected.append(
         {
             'id': item['id'],
@@ -49,12 +49,12 @@ class ClientResponseMock:
 
 
 @pytest.mark.asyncio
-async def test_get_user_repo_multiple_page(mocker):
+async def test_with_multiple_pages(mocker):
     mock_resps = [
-        ClientResponseMock(test_data[:2], 1, last_page=4),
-        ClientResponseMock(test_data[2:4], 2, last_page=4),
-        ClientResponseMock(test_data[4:6], 3, last_page=4),
-        ClientResponseMock(test_data[6:], 4, last_page=4)
+        ClientResponseMock(test_repos[:2], 1, last_page=4),
+        ClientResponseMock(test_repos[2:4], 2, last_page=4),
+        ClientResponseMock(test_repos[4:6], 3, last_page=4),
+        ClientResponseMock(test_repos[6:], 4, last_page=4)
     ]
 
     async def mock_get(*args, params, **kwargs):
@@ -73,9 +73,9 @@ async def test_get_user_repo_multiple_page(mocker):
 
 
 @pytest.mark.asyncio
-async def test_get_user_repo_single_page(mocker):
+async def test_with_single_page(mocker):
     async def mock_get(*args, **kwargs):
-        return ClientResponseMock(test_data, 1, last_page=1)
+        return ClientResponseMock(test_repos, 1, last_page=1)
 
     mocker.patch(
         'aiohttp.ClientSession.get',
@@ -88,7 +88,7 @@ async def test_get_user_repo_single_page(mocker):
 
 
 @pytest.mark.asyncio
-async def test_get_user_repo_for_user_with_no_repos(mocker):
+async def test_with_no_repos(mocker):
     async def mock_get(*args, **kwargs):
         return ClientResponseMock([], 1, last_page=1)
 

@@ -15,7 +15,7 @@ for i in range(3):
         }
     )
 
-test_data = {
+test_langs = {
     0: {
         'lang1': 1,
         'lang2': 2
@@ -47,12 +47,12 @@ class ClientResponseMock:
 
 
 @pytest.mark.asyncio
-async def test_get_user_lang_with_one_repo(mocker):
+async def test_with_one_repo(mocker):
     async def mock_get_user_repos(*args, **kwargs):
         yield test_repos[0]
 
     async def mock_get(*args, **kwargs):
-        return ClientResponseMock(test_data[0])
+        return ClientResponseMock(test_langs[0])
 
     mocker.patch(
         'repolist.logic.API.get_user_repos',
@@ -80,7 +80,7 @@ async def test_get_user_lang_with_one_repo(mocker):
 
 
 @pytest.mark.asyncio
-async def test_get_user_lang_with_many_repos(mocker):
+async def test_with_many_repos(mocker):
     async def mock_get_user_repos(*args, **kwargs):
         for repo in test_repos:
             yield repo
@@ -88,7 +88,7 @@ async def test_get_user_lang_with_many_repos(mocker):
     async def mock_get(session, url, *args, **kwargs):
         print(url)
         repo_num = int(re.search(r'test_user/repo(\d+)', url).group(1))
-        return ClientResponseMock(test_data[repo_num])
+        return ClientResponseMock(test_langs[repo_num])
 
     mocker.patch(
         'repolist.logic.API.get_user_repos',
