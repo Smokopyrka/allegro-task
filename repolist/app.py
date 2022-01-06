@@ -1,4 +1,4 @@
-from flask import Flask, abort
+from flask import Flask, abort, jsonify
 from logic import API, InvalidUserError, UserQuotaExceededError
 
 app = Flask(__name__)
@@ -22,20 +22,17 @@ def handle_exceeded_user_quota(e):
 @app.get('/user/<username>/repos')
 async def get_user_repos(username):
     data = [repo async for repo in api.get_user_repos(username)]
-    return {
-        'data': data
-    }
+    return jsonify(data)
 
 
 @app.get('/user/<username>/stars')
 async def get_user_star_sum(username):
     return {
-        'star_total': await api.get_user_star_total(username)
+        'stars': await api.get_user_star_total(username)
     }
 
 
 @app.get('/user/<username>/languages')
 async def get_user_languages(username):
-    return {
-        'data': await api.get_users_language_list(username)
-    }
+    data = await api.get_users_language_list(username)
+    return jsonify(data)
