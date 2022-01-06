@@ -5,6 +5,7 @@ from flask import Flask, abort, jsonify
 from logic import API, InvalidUserError, UserQuotaExceededError
 
 app = Flask(__name__)
+
 auth_token = os.environ.get('GITHUB_TOKEN')
 username = os.environ.get('GITHUB_USER')
 url = 'https://api.github.com'
@@ -14,15 +15,17 @@ api = API(url, auth_token=auth_token, username=username)
 @app.errorhandler(InvalidUserError)
 def handle_invalid_user(e):
     print(e)
-    return ('<h1>Invalid User</h1>'
-            '<p>Requested user doesn\'t exist</p>', 404)
+    return ({
+        'message': 'User not found'
+    }, 404)
 
 
 @app.errorhandler(UserQuotaExceededError)
 def handle_exceeded_user_quota(e):
     print(e)
-    return ('<h1>User Quota Exceeded</h1>'
-            '<p>User hourly request quota exceeded</p>', 403)
+    return ({
+        'message': 'User quota exceeded'
+    }, 403)
 
 
 @app.get('/user/<username>/repos')
