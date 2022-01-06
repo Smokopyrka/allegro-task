@@ -1,4 +1,3 @@
-from datetime import datetime
 import aiohttp
 import asyncio
 import re
@@ -98,8 +97,8 @@ class API:
                     else:
                         langs[language] = bytes
 
-        ranked_langs = sorted(langs.items(),
-                              key=lambda x: x[1], reverse=True)
+        ranked_langs = sorted(
+            langs.items(), key=lambda x: x[1], reverse=True)
         ret = []
         for key, value in ranked_langs:
             ret.append({'language': key, 'byte_count': value})
