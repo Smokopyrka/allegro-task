@@ -9,8 +9,8 @@
 ## General Info
 Simple REST API written in Flask that can:
 * List all repos along with their star counts for a given user.
-* Getting the sum of star counts of all repos for a given user.
-* Getting the list of all languages the repos of a given user are written in, along with the number of bytes that have been written in each of them, ranked from the most used language to the least used language by byte count.
+* Get the sum of star counts of all repos for a given user.
+* Get the list of all languages the repos of a given user are written in, along with the number of bytes that have been written in each of them, ranked from the most used language to the least used language by byte count.
 
 ## Setup
 
