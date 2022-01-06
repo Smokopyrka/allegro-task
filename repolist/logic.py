@@ -1,6 +1,7 @@
-import aiohttp
 import asyncio
 import re
+
+import aiohttp
 
 
 class InvalidUserError(Exception):

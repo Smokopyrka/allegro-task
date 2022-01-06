@@ -1,6 +1,8 @@
-from flask import Flask, abort, jsonify
-from logic import API, InvalidUserError, UserQuotaExceededError
 import os
+
+from flask import Flask, abort, jsonify
+
+from logic import API, InvalidUserError, UserQuotaExceededError
 
 app = Flask(__name__)
 auth_token = os.environ.get('GITHUB_TOKEN')

@@ -1,6 +1,7 @@
-import pytest
 import aiohttp
+import pytest
 from repolist.logic import API, InvalidUserError, UserQuotaExceededError
+
 
 class ClientErrorResponseMock:
 
