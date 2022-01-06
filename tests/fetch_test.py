@@ -2,11 +2,14 @@ import aiohttp
 import pytest
 from repolist.logic import API, InvalidUserError, UserQuotaExceededError
 
+api = API('dummy.com')
+
 
 class ClientErrorResponseMock:
 
     def __init__(self, status):
         self.status = status
+
 
 @pytest.mark.asyncio
 async def test_fetch(mocker):
@@ -18,10 +21,9 @@ async def test_fetch(mocker):
         mock_get_error
     )
 
-    api = API('dummy.com')
-
     async with aiohttp.ClientSession() as session:
         await api._fetch(session, None)
+
 
 @pytest.mark.asyncio
 async def test_get_user_repo_invalid_user(mocker):
@@ -32,8 +34,6 @@ async def test_get_user_repo_invalid_user(mocker):
         'aiohttp.ClientSession.get',
         mock_get_error
     )
-
-    api = API('dummy.com')
 
     with pytest.raises(InvalidUserError):
         async with aiohttp.ClientSession() as session:
@@ -49,8 +49,6 @@ async def test_get_user_repo_quota_exceeded(mocker):
         'aiohttp.ClientSession.get',
         mock_get_error
     )
-
-    api = API('dummy.com')
 
     with pytest.raises(UserQuotaExceededError):
         async with aiohttp.ClientSession() as session:

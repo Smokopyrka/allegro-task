@@ -1,6 +1,8 @@
 import pytest
 from repolist.logic import API
 
+api = API('dummy.com')
+
 test_data = []
 for i in range(7):
     test_data.append(
@@ -65,8 +67,6 @@ async def test_get_user_repo_multiple_page(mocker):
         mock_get
     )
 
-    api = API('dummy.com')
-
     ret = [repo async for repo in api.get_user_repos('test')]
     actual = sorted(ret, key=lambda item: item['id'])
     assert actual == expected
@@ -82,8 +82,6 @@ async def test_get_user_repo_single_page(mocker):
         mock_get
     )
 
-    api = API('dummy.com')
-
     ret = [repo async for repo in api.get_user_repos('test')]
     actual = sorted(ret, key=lambda item: item['id'])
     assert actual == expected
@@ -98,8 +96,6 @@ async def test_get_user_repo_for_user_with_no_repos(mocker):
         'aiohttp.ClientSession.get',
         mock_get
     )
-
-    api = API('dummy.com')
 
     ret = [repo async for repo in api.get_user_repos('test')]
     assert not ret

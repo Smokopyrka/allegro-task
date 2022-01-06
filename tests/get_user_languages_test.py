@@ -3,6 +3,8 @@ import re
 import pytest
 from repolist.logic import API
 
+api = API('dummy.com')
+
 test_repos = []
 for i in range(3):
     test_repos.append(
@@ -73,8 +75,6 @@ async def test_get_user_lang_with_one_repo(mocker):
         }
     ]
 
-    api = API('dummy.com')
-
     actual = await api.get_users_language_list('test_user')
     assert actual == exptected
 
@@ -114,8 +114,6 @@ async def test_get_user_lang_with_many_repos(mocker):
             'byte_count': 3
         }
     ]
-
-    api = API('dummy.com')
 
     actual = await api.get_users_language_list('test_user')
     assert actual == exptected

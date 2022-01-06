@@ -1,6 +1,8 @@
 import pytest
 from repolist.logic import API
 
+api = API('dummy.com')
+
 test_data = []
 for i in range(7):
     test_data.append(
@@ -22,8 +24,6 @@ async def test_with_one_repo(mocker):
         mock_get_user_repos
     )
 
-    api = API('dummy.com')
-
     assert test_data[0]['star_count'] == await api.get_user_star_total('test')
 
 
@@ -38,10 +38,9 @@ async def test_with_multiple_repo(mocker):
         mock_get_user_repos
     )
 
-    api = API('dummy.com')
-
     expected = sum([data['star_count'] for data in test_data])
     assert expected == await api.get_user_star_total('test')
+
 
 @pytest.mark.asyncio
 async def test_with_no_repos(mocker):
@@ -54,8 +53,6 @@ async def test_with_no_repos(mocker):
         'repolist.logic.API.get_user_repos',
         mock_get_user_repos
     )
-
-    api = API('dummy.com')
 
     expected = 0
     assert expected == await api.get_user_star_total('test')
