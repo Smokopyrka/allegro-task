@@ -1,5 +1,5 @@
 import pytest
-from repolist.logic import API, UserQuotaExceededError, InvalidUserError
+from repolist.logic import API
 
 test_data = []
 for i in range(7):
@@ -10,6 +10,7 @@ for i in range(7):
             'stargazers_count': i
         }
     )
+
 
 expected = []
 for item in test_data:
@@ -45,22 +46,6 @@ class ClientResponseMock:
         return self._page
 
 
-class ClientErrorResponseMock:
-
-    def __init__(self, status):
-        self.status = status
-
-
-def check_get_repo_result(actual, expected):
-    actual = sorted(actual, key=lambda item: item['id'])
-    assert len(actual) == len(expected)
-    for act, exp in zip(actual, expected):
-        assert act['id'] == exp['id']
-        assert act['name'] == exp['name']
-        assert act['stars'] == exp['stars']
-        assert len(act.keys()) == len(exp.keys())
-
-
 @pytest.mark.asyncio
 async def test_get_user_repo_multiple_page(mocker):
     mock_resps = [
@@ -83,7 +68,8 @@ async def test_get_user_repo_multiple_page(mocker):
     api = API()
 
     ret = [repo async for repo in api.get_user_repos('test')]
-    check_get_repo_result(ret, expected)
+    actual = sorted(ret, key=lambda item: item['id'])
+    assert actual == expected
 
 
 @pytest.mark.asyncio
@@ -99,7 +85,8 @@ async def test_get_user_repo_single_page(mocker):
     api = API()
 
     ret = [repo async for repo in api.get_user_repos('test')]
-    check_get_repo_result(ret, expected)
+    actual = sorted(ret, key=lambda item: item['id'])
+    assert actual == expected
 
 
 @pytest.mark.asyncio
@@ -116,35 +103,3 @@ async def test_get_user_repo_for_user_with_no_repos(mocker):
 
     ret = [repo async for repo in api.get_user_repos('test')]
     assert not ret
-
-
-@pytest.mark.asyncio
-async def test_get_user_repo_invalid_user(mocker):
-    async def mock_get_error(*args, **kwargs):
-        return ClientErrorResponseMock(404)
-
-    mocker.patch(
-        'aiohttp.ClientSession.get',
-        mock_get_error
-    )
-
-    api = API()
-
-    with pytest.raises(InvalidUserError):
-        ret = [repo async for repo in api.get_user_repos('test')]
-
-
-@pytest.mark.asyncio
-async def test_get_user_repo_with_exceeded_quota(mocker):
-    async def mock_get_error(*args, **kwargs):
-        return ClientErrorResponseMock(403)
-
-    mocker.patch(
-        'aiohttp.ClientSession.get',
-        mock_get_error
-    )
-
-    api = API()
-
-    with pytest.raises(UserQuotaExceededError):
-        ret = [repo async for repo in api.get_user_repos('test')]
