@@ -1,5 +1,6 @@
 import asyncio
 import re
+from collections import defaultdict
 
 import aiohttp
 
@@ -167,7 +168,7 @@ class API:
 
     async def get_user_star_total(self, user):
         """Calculates the total amount of star_count across all of
-            the given user's GitHub repositories
+        the given user's GitHub repositories
 
         Args:
             user (str): Username of the GitHub user
@@ -181,9 +182,9 @@ class API:
 
     async def get_users_language_list(self, user):
         """Creates an ordered list of the most popular programming
-            languages across all of the given user's GitHub
-            repositories, ranked from most popular, to least popular
-            by the number of bytes written in a given language.
+        languages across all of the given user's GitHub
+        repositories, ranked from most popular, to least popular
+        by the number of bytes written in a given language.
 
         Args:
             user (str): Username of the user
@@ -197,23 +198,19 @@ class API:
                         in a given language
                 }
         """
-        langs = {}
+        langs = defaultdict(lambda: 0)
         async with aiohttp.ClientSession() as session:
-            repos = self.get_user_repos(user)
             tasks = []
-            async for repo in repos:
+            async for repo in self.get_user_repos(user):
                 url = f"{self.api_url}/repos/{repo['name']}/languages"
                 coro = self._fetch(session, url, headers=self._headers)
                 tasks.append(asyncio.create_task(coro))
 
             for task in asyncio.as_completed(tasks):
                 res = await task
-                languages = await res.json()
-                for language, bytes in languages.items():
-                    if langs.get(language) is not None:
-                        langs[language] += bytes
-                    else:
-                        langs[language] = bytes
+                repo_langs = await res.json()
+                for lang_name, byte_count in repo_langs.items():
+                    langs[lang_name] += byte_count
 
         ranked_langs = sorted(
             langs.items(), key=lambda x: x[1], reverse=True)
