@@ -32,30 +32,6 @@ class API:
         if username is not None:
             self._headers['User-Agent'] = username
 
-    def _yield_repos(self, repos):
-        """Converts repositories returned by GitHubAPI into dictionaries
-        containing their id, full_name and star_count
-
-        Args:
-            repos (list): List of repositories returned by GitHubAPI
-
-        Yields:
-            dict: Dictionary containing repository id, full name and
-                    star_count of the following format:
-                {
-                    'id': ID of the repository,
-                    'name': full name of the repository,
-                    'star_count': stargazer_count of the repository
-                }
-        """
-        for repo in repos:
-            res = {
-                'id': repo['id'],
-                'name': repo['full_name'],
-                'star_count': repo['stargazers_count']
-            }
-            yield res
-
     async def _fetch(self, session, url, *, headers={}, params={}):
         """Fetches given URL
 
@@ -97,13 +73,13 @@ class API:
                     'star_count': star count of the repository
                 }
         """
-        async for res in self.fetch_pages(username):
+        async for res in self._fetch_pages(username):
             async with res:
                 raw_repos = await res.json()
                 for repo in self._yield_repos(raw_repos):
                     yield repo
     
-    async def fetch_pages(self, username):
+    async def _fetch_pages(self, username):
         """Fetches each page of user's repositories from the GitHubAPI. 
         Checks if all of user's repositories are on the first page of
         results, if not, grabs the number of the last page of results 
@@ -165,6 +141,29 @@ class API:
         }
         return await self._fetch(session, url, **kwargs)
 
+    def _yield_repos(self, repos):
+        """Converts repositories returned by GitHubAPI into dictionaries
+        containing their id, full_name and star_count
+
+        Args:
+            repos (list): List of repositories returned by GitHubAPI
+
+        Yields:
+            dict: Dictionary containing repository id, full name and
+                    star_count of the following format:
+                {
+                    'id': ID of the repository,
+                    'name': full name of the repository,
+                    'star_count': stargazer_count of the repository
+                }
+        """
+        for repo in repos:
+            res = {
+                'id': repo['id'],
+                'name': repo['full_name'],
+                'star_count': repo['stargazers_count']
+            }
+            yield res
 
     async def get_user_star_total(self, user):
         """Calculates the total amount of star_count across all of
