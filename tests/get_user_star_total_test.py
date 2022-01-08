@@ -24,7 +24,8 @@ async def test_with_one_repo(mocker):
         mock_get_user_repos
     )
 
-    assert test_repos[0]['star_count'] == await api.get_user_star_total('test')
+    expected = test_repos[0]['star_count'] 
+    assert expected == await api.get_user_star_total('test_user')
 
 
 @pytest.mark.asyncio
@@ -39,7 +40,7 @@ async def test_with_multiple_repos(mocker):
     )
 
     expected = sum([data['star_count'] for data in test_repos])
-    assert expected == await api.get_user_star_total('test')
+    assert expected == await api.get_user_star_total('test_user')
 
 
 @pytest.mark.asyncio
@@ -55,4 +56,4 @@ async def test_with_no_repos(mocker):
     )
 
     expected = 0
-    assert expected == await api.get_user_star_total('test')
+    assert expected == await api.get_user_star_total('test_user')

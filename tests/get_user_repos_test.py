@@ -44,7 +44,6 @@ class ClientResponseMock:
         pass
 
     async def json(self):
-        print(f'getting page {self._page}')
         return self._page
 
 
@@ -56,7 +55,6 @@ async def test_with_multiple_pages(mocker):
         ClientResponseMock(test_repos[4:6], 3, last_page=4),
         ClientResponseMock(test_repos[6:], 4, last_page=4)
     ]
-
     async def mock_get(*args, params, **kwargs):
         if (page := params.get('page')) is None:
             page = 1
@@ -67,7 +65,7 @@ async def test_with_multiple_pages(mocker):
         mock_get
     )
 
-    ret = [repo async for repo in api.get_user_repos('test')]
+    ret = [repo async for repo in api.get_user_repos('test_user')]
     actual = sorted(ret, key=lambda item: item['id'])
     assert actual == expected
 
@@ -82,7 +80,7 @@ async def test_with_single_page(mocker):
         mock_get
     )
 
-    ret = [repo async for repo in api.get_user_repos('test')]
+    ret = [repo async for repo in api.get_user_repos('test_user')]
     actual = sorted(ret, key=lambda item: item['id'])
     assert actual == expected
 
@@ -97,5 +95,5 @@ async def test_with_no_repos(mocker):
         mock_get
     )
 
-    ret = [repo async for repo in api.get_user_repos('test')]
+    ret = [repo async for repo in api.get_user_repos('test_user')]
     assert not ret

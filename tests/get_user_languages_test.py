@@ -86,7 +86,6 @@ async def test_with_many_repos(mocker):
             yield repo
 
     async def mock_get(session, url, *args, **kwargs):
-        print(url)
         repo_num = int(re.search(r'test_user/repo(\d+)', url).group(1))
         return ClientResponseMock(test_langs[repo_num])
 
