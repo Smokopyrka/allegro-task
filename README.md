@@ -22,8 +22,8 @@ Make sure you have all the dependencies installed. To do so, execute the command
 **IMPORTANT:**
 Due to the request limiting of the GitHub API, which limits the amounts of request for non-authenticated users to 60 requests per hour, it is highly recommended, to authenticate using a GitHub personal authentication token, which can be generated here: https://github.com/settings/tokens.
 Upon generating the token, declare the following environment variables, and set them to values given below:
-  - `GITHUB_TOKEN=`
-  - `GITHUB_USER=`
+ - `GITHUB_TOKEN=<valid github personal access token>`
+ - `GITHUB_USER=<username of the account the token belongs to>`
 
 ### Running the tests
 To run tests on the project and get info about the code coverage achieved, run `python3 -m pytest --cov=repolist.logic` in the root directory of the project
