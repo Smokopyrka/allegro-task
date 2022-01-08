@@ -31,16 +31,16 @@ class API:
         if username is not None:
             self._headers['User-Agent'] = username
 
-    async def _yield_repos(self, repos):
+    def _yield_repos(self, repos):
         """Converts repositories returned by GitHubAPI into dictionaries
-                containing their id, full_name and star_count
+        containing their id, full_name and star_count
 
         Args:
             repos (list): List of repositories returned by GitHubAPI
 
         Yields:
-            dict: Dictionary containing repository id, full_name and
-                    stargazer_count of the following format:
+            dict: Dictionary containing repository id, full name and
+                    star_count of the following format:
                 {
                     'id': ID of the repository,
                     'name': full name of the repository,
@@ -96,27 +96,33 @@ class API:
                     'star_count': star count of the repository
                 }
         """
-        async with aiohttp.ClientSession() as session:
-            async def fetch_page(page):
-                url = f'{self.api_url}/users/{username}/repos'
-                kwargs = {
-                    'headers': self._headers,
-                    'params': {
-                        'per_page': 100,
-                        'page': page
-                    }
-                }
-                return await self._fetch(session, url, **kwargs)
-
-            res = await fetch_page(1)
+        async for res in self.fetch_pages(username):
             async with res:
                 raw_repos = await res.json()
-                async for repo in self._yield_repos(raw_repos):
+                for repo in self._yield_repos(raw_repos):
                     yield repo
+    
+    async def fetch_pages(self, username):
+        """Fetches each page of user's repositories from the GitHubAPI. 
+        Checks if all of user's repositories are on the first page of
+        results, if not, grabs the number of the last page of results 
+        from the first response's header and asynchronously fetches all
+        the other pages.
+
+        Args:
+            username (str): Username of the GitHub user
+
+        Yields:
+            aiohttp.ClientResponse: Response containing user's repositories
+                fetched from the GitHubAPI
+        """
+        async with aiohttp.ClientSession() as session:
+            first_res = await self._fetch_repo_page(session, username, 1)
+            yield first_res
 
             # Stops function's execution if all of the user's
-            # repos are on the first page.
-            if (links := res.headers.get('Link')) is None:
+            # repos are on the first page of the results.
+            if (links := first_res.headers.get('Link')) is None:
                 return
 
             # Searches for the number of the last page of
@@ -126,13 +132,38 @@ class API:
             last_page = int(last_page_match.group(1))
 
             # Fetches all the other pages
-            tasks = [fetch_page(i) for i in range(2, last_page + 1)]
-            for task in asyncio.as_completed(tasks):
-                res = await task
-                async with res:
-                    raw_repos = await res.json()
-                    async for repo in self._yield_repos(raw_repos):
-                        yield repo
+            tasks = []
+            for i in range(2, last_page + 1):
+                task = asyncio.create_task(
+                    self._fetch_repo_page(session, username, i))
+                tasks.append(task)
+            for res in asyncio.as_completed(tasks):
+                yield await res
+
+    async def _fetch_repo_page(self, session, username, page):
+        """Fetches specified page of user's GitHub repositories from the
+        GitHubAPI.
+
+        Args:
+            session (aiohttp.ClientSession): Session used for making HTTP
+            requests
+            username (str): Username of the GitHub user
+            page (int): Number of the page to fetch
+
+        Returns:
+            aiohttp.ClientResponse: Response containing user's repositories
+                fetched from the GitHubAPI
+        """
+        url = f'{self.api_url}/users/{username}/repos'
+        kwargs = {
+            'headers': self._headers,
+            'params': {
+                'per_page': 100,
+                'page': page
+            }
+        }
+        return await self._fetch(session, url, **kwargs)
+
 
     async def get_user_star_total(self, user):
         """Calculates the total amount of star_count across all of
@@ -173,7 +204,7 @@ class API:
             async for repo in repos:
                 url = f"{self.api_url}/repos/{repo['name']}/languages"
                 coro = self._fetch(session, url, headers=self._headers)
-                tasks.append(coro)
+                tasks.append(asyncio.create_task(coro))
 
             for task in asyncio.as_completed(tasks):
                 res = await task
