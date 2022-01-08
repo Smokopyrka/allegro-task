@@ -14,7 +14,6 @@ api = API(url, auth_token=auth_token, username=username)
 
 @app.errorhandler(InvalidUserError)
 def handle_invalid_user(e):
-    print(e)
     return ({
         'message': 'User not found'
     }, 404)
@@ -22,7 +21,6 @@ def handle_invalid_user(e):
 
 @app.errorhandler(UserQuotaExceededError)
 def handle_exceeded_user_quota(e):
-    print(e)
     return ({
         'message': 'User quota exceeded'
     }, 403)
