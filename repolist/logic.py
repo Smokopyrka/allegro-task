@@ -36,8 +36,8 @@ class API:
         """Fetches given URL
 
         Args:
-            session (aiohttp.ClientSession): session on wihch to call
-                the .get() method
+            session (aiohttp.ClientSession): Session used for making HTTP
+            requests
             url (str): URL to fetch
             headers (dict, optional): request headers. Defaults to {}.
             params (dict, optional): request query string parameters.
